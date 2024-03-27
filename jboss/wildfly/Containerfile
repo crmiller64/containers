@@ -1,0 +1,9 @@
+# Containerfile to build image for JBoss Wildfly 18 (equivalent to JBoss EAP 7.3)
+# https://access.redhat.com/solutions/21906
+# https://quay.io/repository/wildfly/wildfly?tab=info
+FROM jboss/wildfly:18.0.1.Final
+
+# File author / maintainer
+LABEL maintainer="Caleb Miller <crmiller128@gmail.com>"
+
+ADD application.war /opt/jboss/wildfly/standalone/deployments/

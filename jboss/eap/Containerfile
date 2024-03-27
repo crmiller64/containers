@@ -1,0 +1,21 @@
+# Containerfile to build image for JBoss EAP 7.3
+# Modified from:
+# https://gloriapalmagonzalez.medium.com/example-dockerfile-jboss-eap-7-for-deploying-an-application-using-the-deployment-scanner-e6841bc180
+
+# Start from eap73-openshift
+FROM registry.redhat.io/jboss-eap-7/eap73-openjdk11-openshift-rhel8:7.3.10-2
+
+# File author / maintainer
+LABEL maintainer="Caleb Miller <crmiller128@gmail.com>"
+
+# Copy WAR to deployments folder
+COPY application.war $JBOSS_HOME/standalone/deployments/
+
+# User root to modify WAR owners
+USER root
+
+# Modify WAR owners
+RUN chown jboss:jboss $JBOSS_HOME/standalone/deployments/application.war
+
+# IMPORTANT: use jboss user to run image
+USER jboss

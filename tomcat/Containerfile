@@ -1,0 +1,43 @@
+# Modified from:
+# https://medium.com/@pra4mesh/deploy-war-in-docker-tomcat-container-b52a3baea448
+
+# Extend everything from tomcat:9-jdk11 image
+FROM tomcat:9-jdk11
+
+LABEL maintainer="Caleb Miller <crmiller128@gmail.com>"
+
+# LOG4J2 SETUP BEGIN
+# Modified from:
+# https://github.com/lurodrig/log4j2-in-tomcat/blob/master/Dockerfile
+
+# Create directories
+RUN mkdir -pv $CATALINA_HOME/log4j2/lib
+RUN mkdir -pv $CATALINA_HOME/log4j2/conf
+
+# Add Log4j2 dependencies
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-api-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.16.0/log4j-api-2.16.0.jar 
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-core-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.16.0/log4j-core-2.16.0.jar
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-appserver-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-appserver/2.16.0/log4j-appserver-2.16.0.jar
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-jul-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-jul/2.16.0/log4j-jul-2.16.0.jar 
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-jcl-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-jcl/2.16.0/log4j-jcl-2.16.0.jar
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-slf4j-impl-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.16.0/log4j-slf4j-impl-2.16.0.jar
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-web-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-web/2.16.0/log4j-web-2.16.0.jar
+RUN curl -o $CATALINA_HOME/log4j2/lib/log4j-1.2-api-2.16.0.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-1.2-api/2.16.0/log4j-1.2-api-2.16.0.jar
+RUN curl -o $CATALINA_HOME/log4j2/lib/slf4j-api-1.7.32.jar https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.32/slf4j-api-1.7.32.jar
+
+# Add config
+ADD setup/log4j2-tomcat.xml $CATALINA_HOME/log4j2/conf/log4j2-tomcat.xml
+
+# Add libraries and config files to the CLASSPATH
+ADD setup/setenv.sh $CATALINA_HOME/bin
+
+# Remove the $CATALINA_HOME/conf/logging.properties
+RUN rm $CATALINA_HOME/conf/logging.properties
+
+# context.xml will redirect all the System.out and System.err to catalina.log
+ADD setup/context.xml $CATALINA_HOME/conf/context.xml
+
+# LOG4J2 SETUP END
+
+# Copy WAR to /webapps in Tomcat Docker container
+COPY application.war /usr/local/tomcat/webapps/
