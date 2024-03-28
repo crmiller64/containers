@@ -9,9 +9,7 @@
         -   `docker pull container-registry.oracle.com/database/enterprise:19.3.0.0`
     -   Use this image 19 for **ARM64** systems (Mac M1/M2/M3)
         -   `docker pull container-registry.oracle.com/database/enterprise:19.19.0.0`
--   Copy the needed database dumps `*.dmp` files to the `setup/` directory
-    -   `dump_1.dmp`
-    -   `dump_2.dmp`
+-   Copy any needed database dumps `*.dmp` files to the `setup/` directory
 -   Grant read+write file permissions to the `setup` directory
     -   `chmod -R 777 setup`
 -   Create an `oradata` volume to mount to the Oracle container
@@ -23,7 +21,7 @@
             -e ORACLE_PWD=Welcome1 \
             -e ORACLE_EDITION=enterprise \
             -v oradata:/opt/oracle/oradata \
-            # mount scripts and database dumps to setup kc database
+            # mount scripts and database dumps to setup database
             -v /Users/path/to/containers/oracle/setup:/opt/oracle/scripts/setup \
             container-registry.oracle.com/database/enterprise:19.19.0.0
         ```
